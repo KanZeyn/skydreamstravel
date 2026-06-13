@@ -43,22 +43,41 @@ function initNavbar() {
    2. MOBILE MENU — Hamburger toggle
    ════════════════════════════════════════════════════════════ */
 function initMobileMenu() {
-  const toggle = document.getElementById('navToggle');
-  const menu   = document.getElementById('navMenu');
+  const toggle  = document.getElementById('navToggle');
+  const menu    = document.getElementById('navMenu');
+  const overlay = document.getElementById('navOverlay');
   if (!toggle || !menu) return;
 
   const openMenu = () => {
     toggle.classList.add('open');
     menu.classList.add('open');
+    if (overlay) overlay.classList.add('open');
     toggle.setAttribute('aria-expanded', 'true');
+    // Prevent background scroll AND page shift
+    const scrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
     document.body.style.overflow = 'hidden';
+    document.body.dataset.scrollY = scrollY;
   };
 
   const closeMenu = () => {
     toggle.classList.remove('open');
     menu.classList.remove('open');
+    if (overlay) overlay.classList.remove('open');
     toggle.setAttribute('aria-expanded', 'false');
+    // Restore scroll position
+    const scrollY = parseInt(document.body.dataset.scrollY || '0', 10);
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
     document.body.style.overflow = '';
+    window.scrollTo(0, scrollY);
   };
 
   toggle.addEventListener('click', () => {
@@ -66,14 +85,19 @@ function initMobileMenu() {
     isOpen ? closeMenu() : openMenu();
   });
 
+  // Overlay tıklayınca kapat
+  if (overlay) {
+    overlay.addEventListener('click', closeMenu);
+  }
+
   // Menüdeki bir linke tıklayınca kapat
   menu.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', closeMenu);
   });
 
-  // Dışarı tıklayınca kapat
+  // Dışarı tıklayınca kapat (fallback)
   document.addEventListener('click', (e) => {
-    if (!menu.contains(e.target) && !toggle.contains(e.target)) {
+    if (!menu.contains(e.target) && !toggle.contains(e.target) && e.target !== overlay) {
       closeMenu();
     }
   });
