@@ -442,7 +442,9 @@ function initReelSound() {
   video.muted = true;
   video.play().catch(() => {});
 
-  rehberReel.addEventListener('click', () => {
+  rehberReel.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     // Playlist reel'i de sustur
     const pv = document.getElementById('videoPlaylist');
     const pr = document.getElementById('reelPlaylist');
@@ -503,7 +505,7 @@ function initReelSound() {
     sources.forEach((_, i) => {
       const dot = document.createElement('span');
       dot.className = 'playlist-dot' + (i === 0 ? ' active' : '');
-      dot.addEventListener('click', (e) => { e.stopPropagation(); loadVideo(i); });
+      dot.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); loadVideo(i); });
       dotsWrap.appendChild(dot);
     });
   }
@@ -519,11 +521,13 @@ function initReelSound() {
   video.addEventListener('ended', () => loadVideo(current + 1));
 
   // Prev / Next butonları
-  if (prevBtn) prevBtn.addEventListener('click', (e) => { e.stopPropagation(); loadVideo(current - 1); });
-  if (nextBtn) nextBtn.addEventListener('click', (e) => { e.stopPropagation(); loadVideo(current + 1); });
+  if (prevBtn) prevBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); loadVideo(current - 1); });
+  if (nextBtn) nextBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); loadVideo(current + 1); });
 
   // Reel tıklaması → ses toggle (rehberi sustur)
-  reel.addEventListener('click', () => {
+  reel.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     const rehber = document.getElementById('videoRehber');
     const rehberReel = document.getElementById('reelRehber');
     if (rehber) { rehber.muted = true; }
